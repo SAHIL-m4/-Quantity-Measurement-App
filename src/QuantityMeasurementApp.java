@@ -1,44 +1,57 @@
 public class QuantityMeasurementApp {
-    public static class Feet {
-        private final double value;
-        public Feet(double value) {
-            this.value = value;
+    public enum LengthUnit {
+        FEET(12.0),
+        INCHES(1.0);
+        private final double conversionFactor;
+        LengthUnit(double conversionFactor) {
+            this.conversionFactor = conversionFactor;
         }
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Feet that = (Feet) obj;
-            return Double.compare(that.value, this.value) == 0;
+        public double getConversionFactor() {
+            return conversionFactor;
         }
     }
-    public static class Inches {
+    public static class Length {
         private final double value;
-        public Inches(double value) {
+        private final LengthUnit unit;
+        public Length(double value, LengthUnit unit) {
             this.value = value;
+            this.unit = unit;
+        }
+        private double convertToBaseUnit() {
+            return value * unit.getConversionFactor();
         }
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Inches that = (Inches) obj;
-            return Double.compare(that.value, this.value) == 0;
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Length length = (Length) o;
+            return Double.compare(this.convertToBaseUnit(), length.convertToBaseUnit()) == 0;
         }
     }
     public static void demonstrateFeetEquality() {
-        Feet f1 = new Feet(1.0);
-        Feet f2 = new Feet(1.0);
+        Length f1 = new Length(1.0, LengthUnit.FEET);
+        Length f2 = new Length(1.0, LengthUnit.FEET);
         System.out.println("Input: 1.0 ft and 1.0 ft");
         System.out.println("Output: Equal (" + f1.equals(f2) + ")");
     }
     public static void demonstrateInchesEquality() {
-        Inches i1 = new Inches(1.0);
-        Inches i2 = new Inches(1.0);
+        Length i1 = new Length(1.0, LengthUnit.INCHES);
+        Length i2 = new Length(1.0, LengthUnit.INCHES);
         System.out.println("Input: 1.0 inch and 1.0 inch");
         System.out.println("Output: Equal (" + i1.equals(i2) + ")");
     }
+    public static void demonstrateCrossUnitEquality() {
+        Length feet = new Length(1.0, LengthUnit.FEET);
+        Length inches = new Length(12.0, LengthUnit.INCHES);
+        System.out.println("Input: 1.0 ft and 12.0 inches");
+        System.out.println("Output: Equal (" + feet.equals(inches) + ")");
+    }
     public static void main(String[] args) {
+        System.out.println("--- UC1: Feet Equality ---");
         demonstrateFeetEquality();
+        System.out.println("\n--- UC2: Inches Equality ---");
         demonstrateInchesEquality();
+        System.out.println("\n--- UC3: Cross-Unit Comparison ---");
+        demonstrateCrossUnitEquality();
     }
 }
