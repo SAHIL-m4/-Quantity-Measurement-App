@@ -1,4 +1,3 @@
-import java.util.Objects;
 class Length {
     private final double value;
     private final LengthUnit unit;
