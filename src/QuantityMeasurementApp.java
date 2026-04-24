@@ -55,14 +55,10 @@ public class Length {
             Length oneFoot = new Length(1, LengthUnit.FEET);
             Length resultInInches = oneFoot.convertTo(LengthUnit.INCHES);
             System.out.println("Conversion: " + oneFoot + " is " + resultInInches);
-
             Length threeYards = new Length(3, LengthUnit.YARDS);
             System.out.println("Conversion: " + threeYards + " is " + threeYards.convertTo(LengthUnit.FEET));
-
-            // Equality Examples (Cross-unit)
             Length twelveInches = new Length(12, LengthUnit.INCHES);
             demonstrateEquality(oneFoot, twelveInches);
-
             Length cm = new Length(2.54, LengthUnit.CENTIMETERS);
             Length inch = new Length(1, LengthUnit.INCHES);
             demonstrateEquality(cm, inch);
