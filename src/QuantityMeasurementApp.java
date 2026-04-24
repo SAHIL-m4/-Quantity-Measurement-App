@@ -1,26 +1,35 @@
-class Length {
+import java.util.Objects;
+public class Length {
     private final double value;
     private final LengthUnit unit;
     public enum LengthUnit {
-        FEET(12.0),
-        INCHES(1.0),
-        YARDS(36.0),
+        FEET(12.0), 
+        INCHES(1.0), 
+        YARDS(36.0), 
         CENTIMETERS(0.393701);
         private final double conversionFactor;
-        LengthUnit(double conversionFactor) {
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double factor) {
+            this.conversionFactor = factor;
         }
         public double getConversionFactor() {
-            return this.conversionFactor;
+            return conversionFactor;
         }
     }
     public Length(double value, LengthUnit unit) {
+        if (unit == null) throw new IllegalArgumentException("Unit cannot be null");
         this.value = value;
         this.unit = unit;
     }
     private double convertToBaseUnit() {
-        double inInches = this.value * this.unit.getConversionFactor();
-        return Math.round(inInches * 10000.0) / 10000.0;
+        double rawInches = this.value * this.unit.getConversionFactor();
+        return Math.round(rawInches * 100.0) / 100.0;
+    }
+    public Length convertTo(LengthUnit targetUnit) {
+        if (targetUnit == null) throw new IllegalArgumentException("Target unit null");
+        double valueInInches = this.value * this.unit.getConversionFactor();
+        double convertedValue = valueInInches / targetUnit.getConversionFactor();
+        double roundedValue = Math.round(convertedValue * 100.0) / 100.0;  
+        return new Length(roundedValue, targetUnit);
     }
     @Override
     public boolean equals(Object o) {
@@ -33,18 +42,30 @@ class Length {
     public int hashCode() {
         return Objects.hash(convertToBaseUnit());
     }
-}
-public class QuantityMeasurementApp{
-    public static void main(String[] args) {
-        System.out.println("--- Exécution UC4 : Vérification des Mesures ---");
-        Length yard = new Length(1.0, Length.LengthUnit.YARDS);
-        Length feet = new Length(3.0, Length.LengthUnit.FEET);
-        System.out.println("1 Yard == 3 Feet ? " + yard.equals(feet));
-        Length yard2 = new Length(1.0, Length.LengthUnit.YARDS);
-        Length inches = new Length(36.0, Length.LengthUnit.INCHES);
-        System.out.println("1 Yard == 36 Inches ? " + yard2.equals(inches));
-        Length cm = new Length(1.0, Length.LengthUnit.CENTIMETERS);
-        Length inchRef = new Length(0.393701, Length.LengthUnit.INCHES);
-        System.out.println("1 CM == 0.393701 Inches ? " + cm.equals(inchRef));
+    @Override
+    public String toString() {
+        return String.format("%.2f %s", value, unit);
+    }
+    public static class App {
+        public static void demonstrateEquality(Length l1, Length l2) {
+            System.out.printf("Comparing [%s] and [%s] -> Equal: %b\n", l1, l2, l1.equals(l2));
+        }
+        public static void main(String[] args) {
+            System.out.println("=== Quantity Measurement App (UC5) ===\n");
+            Length oneFoot = new Length(1, LengthUnit.FEET);
+            Length resultInInches = oneFoot.convertTo(LengthUnit.INCHES);
+            System.out.println("Conversion: " + oneFoot + " is " + resultInInches);
+
+            Length threeYards = new Length(3, LengthUnit.YARDS);
+            System.out.println("Conversion: " + threeYards + " is " + threeYards.convertTo(LengthUnit.FEET));
+
+            // Equality Examples (Cross-unit)
+            Length twelveInches = new Length(12, LengthUnit.INCHES);
+            demonstrateEquality(oneFoot, twelveInches);
+
+            Length cm = new Length(2.54, LengthUnit.CENTIMETERS);
+            Length inch = new Length(1, LengthUnit.INCHES);
+            demonstrateEquality(cm, inch);
+        }
     }
 }
